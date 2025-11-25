@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MenuBar from "./components/MenuBar.js";
 import Home from "./pages/Home";
 import NewItem from "./pages/NewItem";
-import Remove from "./pages/Remove";
+import RemoveItem from "./pages/RemoveItem.js";
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/new" element={<NewItem />} />
-            <Route path="/remove" element={<Remove />} />
+            <Route path="/remove" element={<RemoveItem />} />
           </Routes>
         </main>
       </div>
