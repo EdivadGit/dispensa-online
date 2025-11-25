@@ -2,7 +2,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MenuBar from "./components/MenuBar.js";
 import Home from "./pages/Home";
 import NewItem from "./pages/NewItem";
-import RemoveItem from "./pages/RemoveItem.js";
+import RemoveItem from "./pages/RemoveItem";
+
+import ProductDetails from "./pages/ProductDetails";
+import EditProduct from "./pages/EditProduct";
 
 function App() {
   return (
@@ -14,6 +17,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/new" element={<NewItem />} />
             <Route path="/remove" element={<RemoveItem />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/product/:id/edit" element={<EditProduct />} />
           </Routes>
         </main>
       </div>
