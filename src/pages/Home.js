@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Product from "../class/Product";
 import { Icon } from "@mdi/react";
 import {
@@ -10,7 +10,9 @@ import {
   mdiSort,
   mdiSortAscending,
   mdiSortDescending,
+  mdiClose, // added close icon
 } from "@mdi/js";
+import Success from "../components/Success";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -23,6 +25,18 @@ export default function Home() {
   const [pantry, setPantry] = useState("all");
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const location = useLocation();
+
+  // Success modal visibility (initialized from location.state)
+  const [showSuccess, setShowSuccess] = useState(
+    !!location?.state?.showSuccess
+  );
+
+  useEffect(() => {
+    if (location?.state?.showSuccess) {
+      setShowSuccess(true);
+    }
+  }, [location?.state?.showSuccess]);
 
   // Sort
   const [sortBy, setSortBy] = useState("expires"); // 'expires', 'name', 'quantity'
@@ -118,21 +132,10 @@ export default function Home() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded flex items-center gap-2">
-          <Icon path={mdiAlertCircle} size={1} />
-          <span>{error}</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-6xl mx-auto p-4 space-y-6">
+    <div className="max-w-6xl mx-auto p-4 space-y-6 relative h-full">
       {/* Header & Stats */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-5">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">La tua Dispensa</h1>
           <p className="text-gray-500 text-sm">
@@ -269,6 +272,30 @@ export default function Home() {
           {filteredAndSortedProducts.map((product) =>
             product.renderCard(navigate)
           )}
+        </div>
+      )}
+
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="relative bg-white rounded-xl shadow-xl max-w-sm w-full p-6 space-y-4 animate-in fade-in zoom-in duration-200">
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setShowSuccess(false);
+                // clear the location state to avoid re-opening on navigation
+                navigate(location?.pathname || "/", {
+                  replace: true,
+                  state: {},
+                });
+              }}
+              aria-label="Close"
+              className="absolute top-3 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
+            >
+              <Icon path={mdiClose} size={1} />
+            </button>
+
+            {Success()}
+          </div>
         </div>
       )}
     </div>

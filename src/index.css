@@ -2,8 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-#root, .App {
-  height: 100vh;
+html, body, #root {
+  height: 100%;
+}
+
+/* Layout: usa flex per gestire header/main/footer
+   .App diventa un contenitore column flex e main si espande */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 #reader video {
@@ -17,4 +25,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Rendiamo il container principale l'unico area scrollabile
+   e abilitiamo lo scrolling fluido su iOS/mobile */
+main {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }

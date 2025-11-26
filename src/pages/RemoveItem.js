@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Html5Qrcode } from "html5-qrcode";
 import { mdiBarcodeScan, mdiLoading } from "@mdi/js";
 import { Icon } from "@mdi/react";
 
 export default function RemoveItem() {
-  const navigate = useNavigate();
   const scannerRef = useRef(null);
   const [scanning, setScanning] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -150,7 +148,7 @@ export default function RemoveItem() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 rounded-lg">
+    <div className="max-w-2xl mx-auto p-4 rounded-lg h-full">
       <h1 className="text-2xl font-bold mb-6">Rimuovi un prodotto</h1>
 
       {error && (

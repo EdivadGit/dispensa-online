@@ -69,7 +69,7 @@ export default function EditProduct() {
 
       if (!response.ok) throw new Error("Errore durante il salvataggio");
 
-      navigate(`/product/${id}`);
+      navigate("/", { state: { showSuccess: true } });
     } catch (err) {
       setError(err.message);
     }
@@ -89,7 +89,7 @@ export default function EditProduct() {
     );
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6">
+    <div className="max-w-2xl mx-auto p-4 space-y-6 h-full">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center text-gray-600 hover:text-gray-900"

@@ -88,6 +88,16 @@ class Product {
     };
   }
 
+  getPantryColor() {
+    const pantryColors = {
+      Gruppo: "gray",
+      Branco: "yellow",
+      Reparto: "green",
+      Clan: "red",
+    };
+    return pantryColors[this.pantry] || "gray";
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -212,12 +222,74 @@ class Product {
   }
 
   async save() {
+    // Upload image (supports File via FormData or base64 data URL). Replace image with server path.
+    let imagePath = this.image;
+
+    try {
+      // Browser File upload via FormData (recommended)
+      if (
+        imagePath &&
+        typeof File !== "undefined" &&
+        imagePath instanceof File
+      ) {
+        const form = new FormData();
+        const filename = `${this.id}_${imagePath.name || "image.png"}`;
+        form.append("file", imagePath, filename);
+
+        const uploadResp = await fetch("/api/upload_image", {
+          method: "POST",
+          body: form,
+        });
+
+        if (!uploadResp.ok) {
+          console.warn(
+            "Image file upload failed, continuing without uploaded image"
+          );
+        } else {
+          const json = await uploadResp.json();
+          if (json && json.path) imagePath = json.path;
+        }
+      }
+
+      // Fallback: base64 data URL (existing flow)
+      else if (
+        imagePath &&
+        typeof imagePath === "string" &&
+        imagePath.startsWith("data:")
+      ) {
+        const uploadResp = await fetch("/api/upload_image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            image: imagePath,
+            filename: `${this.id}.png`,
+          }),
+        });
+
+        if (!uploadResp.ok) {
+          console.warn(
+            "Image upload failed, continuing and saving product without uploaded image"
+          );
+        } else {
+          const json = await uploadResp.json();
+          if (json && json.path) imagePath = json.path;
+        }
+      }
+    } catch (err) {
+      console.warn("Error uploading image:", err);
+    }
+
+    const payload = this.toJSON();
+    payload.image = imagePath;
+
     const response = await fetch("/api/products", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(this.toJSON()),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {

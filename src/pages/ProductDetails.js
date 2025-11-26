@@ -51,7 +51,7 @@ export default function ProductDetails() {
         method: "DELETE",
       });
       if (response.ok) {
-        navigate("/");
+        navigate("/", { state: { showSuccess: true } });
       } else {
         throw new Error("Errore durante l'eliminazione");
       }
@@ -85,7 +85,7 @@ export default function ProductDetails() {
       : mdiCheckCircle;
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-6 relative">
+    <div className="relative h-full space-y-6 max-w-3xl mx-auto p-4">
       <a
         href="/"
         className="flex items-center text-gray-600 hover:text-gray-900"
@@ -93,7 +93,7 @@ export default function ProductDetails() {
         <Icon path={mdiArrowLeft} size={1} /> Torna indietro
       </a>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="h-64 bg-gray-100 relative">
           <img
             src={product.getDisplayImage()}
@@ -108,10 +108,20 @@ export default function ProductDetails() {
               <h1 className="text-3xl font-bold text-gray-800">
                 {product.name}
               </h1>
-              <p className="text-gray-500 capitalize">
-                {product.category} • {product.pantry}
+              <p className="text-gray-500 capitalize mt-4">
+                <span
+                  className={`px-6 bg-${product.getPantryColor()}-50 border-${product.getPantryColor()}-800 text-${product.getPantryColor()}-700 border p-1 rounded-full font-medium`}
+                >
+                  {product.pantry}
+                </span>{" "}
+                • {product.category}
               </p>
             </div>
+            <span className="bg-green-50 border-green-800 text-green-700"></span>
+            <span className="bg-yellow-50 border-yellow-800 text-yellow-700"></span>
+            <span className="bg-red-50 border-red-800 text-red-700"></span>
+            <span className="bg-gray-50 border-gray-800 text-gray-700"></span>
+
             <div className="flex gap-2">
               <button
                 onClick={() => navigate(`/product/${id}/edit`)}
@@ -151,7 +161,7 @@ export default function ProductDetails() {
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-500">Codice a barre</p>
-              <p className="text-xl font-bold text-gray-800 font-mono">
+              <p className="font-bold text-gray-800 font-mono text-sm">
                 {product.barcode || "-"}
               </p>
             </div>

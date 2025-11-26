@@ -12,7 +12,7 @@ function App() {
     <Router>
       <div className="App">
         <MenuBar />
-        <main className="p-4 h-[calc(100vh-3.5rem)] overflow-auto ">
+        <main className="p-4 flex-1 overflow-auto">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/new" element={<NewItem />} />
@@ -20,6 +20,7 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/product/:id/edit" element={<EditProduct />} />
           </Routes>
+          <div className="h-14"></div>
         </main>
       </div>
     </Router>

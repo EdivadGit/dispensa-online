@@ -16,7 +16,6 @@ export default function NewItem() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [success_save, setSuccess_save] = useState("");
 
   const [formData, setFormData] = useState({
     barcode: "",
@@ -31,7 +30,6 @@ export default function NewItem() {
     imagePreview: null,
   });
 
-  // Cleanup scanner on unmount
   useEffect(() => {
     return () => {
       if (scannerRef.current) {
@@ -44,7 +42,6 @@ export default function NewItem() {
     };
   }, []);
 
-  // Warn on unsaved changes when closing tab/refreshing
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       const hasChanges =
@@ -55,7 +52,7 @@ export default function NewItem() {
         formData.barcode;
       if (hasChanges) {
         e.preventDefault();
-        e.returnValue = ""; // Chrome requires returnValue to be set
+        e.returnValue = "";
       }
     };
 
@@ -89,8 +86,6 @@ export default function NewItem() {
   const startScanning = async () => {
     setScanning(true);
     setError("");
-
-    // Small delay to ensure the div is rendered
     setTimeout(() => {
       const html5QrCode = new Html5Qrcode("reader");
       scannerRef.current = html5QrCode;
@@ -122,15 +117,13 @@ export default function NewItem() {
           setSuccess("Barcode scansionato!");
         })
         .then(() => {
-          // Dopo l'avvio, puoi accedere alle capacità della fotocamera
           const capabilities = html5QrCode.getRunningTrackCapabilities();
           console.log("Camera capabilities:", capabilities);
 
-          // Applica lo zoom se supportato
           if (capabilities.zoom) {
             html5QrCode
               .applyVideoConstraints({
-                advanced: [{ zoom: 3.0 }], // Regola questo valore (es. 1.5, 2.0, 2.5)
+                advanced: [{ zoom: 3.0 }],
               })
               .then(() => {
                 console.log("Zoom applicato con successo");
@@ -152,7 +145,6 @@ export default function NewItem() {
           setScanning(false);
         })
         .catch((err) => {
-          // Ignore "not running" error which happens if user cancels before start completes
           console.warn("Failed to stop scanner:", err);
           setScanning(false);
         });
@@ -166,7 +158,6 @@ export default function NewItem() {
     setError("");
     setSuccess("");
 
-    // Validation
     if (!formData.name || !formData.quantity || !formData.expires) {
       setError("Perfavore completa tutti i campi.");
       return;
@@ -183,9 +174,8 @@ export default function NewItem() {
     setLoading(true);
 
     try {
-      // Create Product instance
       const newProduct = await new Product(
-        Date.now().toString(), // Simple ID generation
+        Date.now().toString(),
         formData.name,
         formData.category,
         formData.expires,
@@ -194,33 +184,13 @@ export default function NewItem() {
         formData.pantry,
         formData.unit,
         formData.notes,
-        formData.imagePreview, // Save the base64 string
-        new Date().toISOString() // addedDate
+        formData.image,
+        new Date().toISOString()
       );
-
-      // Send to server
       await newProduct.save();
-      setSuccess_save("Prodotto salvato con successo!");
 
-      // Reset form to prevent unsaved changes warning
-      setFormData({
-        barcode: "",
-        name: "",
-        quantity: 1,
-        unit: UNITS[0],
-        expires: "",
-        category: CATEGORIES[0],
-        pantry: PANTRY[0],
-        notes: "",
-        image: null,
-        imagePreview: null,
-      });
-
-      setTimeout(() => {
-        setLoading(false);
-        // navigate("/new"); // Stay on page or navigate? User said "vado in un'altra pagina" implies they might want to stay or go.
-        // If we reset form, staying is fine.
-      }, 2000);
+      navigate("/", { state: { showSuccess: true } });
+      return;
     } catch (err) {
       console.error("Error saving product:", err);
       setError("Impossibile salvare il prodotto. ");
@@ -229,7 +199,7 @@ export default function NewItem() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 rounded-lg">
+    <div className="max-w-2xl mx-auto p-4 rounded-lg h-full">
       <h1 className="text-2xl font-bold mb-6">
         Aggiungi un prodotto alla dispensa
       </h1>
@@ -340,7 +310,7 @@ export default function NewItem() {
           </div>
         </div>
 
-        <div>
+        <div className="w-full">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Scadenza <span className="text-red-500">*</span>
           </label>
@@ -429,11 +399,6 @@ export default function NewItem() {
           )}
         </div>
 
-        {success_save && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mt-4">
-            {success_save}
-          </div>
-        )}
         <div className="flex gap-3 pt-4">
           <button
             type="button"

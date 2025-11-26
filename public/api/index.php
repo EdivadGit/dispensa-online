@@ -50,6 +50,60 @@ $method = $_SERVER['REQUEST_METHOD'];
 // /products/:barcode
 // /products/item/:id
 
+// Upload image endpoint: accepts JSON { image: "data:...base64...", filename: "name.png" }
+if ($route === '/upload_image' || $route === '/upload_image/') {
+    if ($method === 'POST') {
+        // Support multipart/form-data uploads via 'file' field
+        if (!empty($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            $origName = $_FILES['file']['name'];
+            $filename = isset($origName) ? basename($origName) : uniqid('img_') . '.png';
+            $imgDir = __DIR__ . '/../../server/images';
+            if (!is_dir($imgDir)) mkdir($imgDir, 0755, true);
+            $filePath = $imgDir . '/' . $filename;
+            if (!move_uploaded_file($_FILES['file']['tmp_name'], $filePath)) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => 'Failed to move uploaded file']);
+                exit();
+            }
+            $publicPath = '/server/images/' . $filename;
+            echo json_encode(['success' => true, 'path' => $publicPath, 'filename' => $filename]);
+            exit();
+        }
+
+        // Fallback: accept JSON with data URI
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input || !isset($input['image'])) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'No image provided']);
+            exit();
+        }
+
+        $imageData = $input['image'];
+        $filename = isset($input['filename']) ? basename($input['filename']) : uniqid('img_') . '.png';
+
+        if (preg_match('/^data:(.*?);base64,(.*)$/', $imageData, $matches)) {
+            $data = base64_decode($matches[2]);
+            $imgDir = __DIR__ . '/../../server/images';
+            if (!is_dir($imgDir)) mkdir($imgDir, 0755, true);
+            $filePath = $imgDir . '/' . $filename;
+            if (file_put_contents($filePath, $data) === false) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => 'Failed to write image']);
+                exit();
+            }
+
+            // Return a path that the client can use. Adjust if your server serves images from a different URL.
+            $publicPath = '/server/images/' . $filename;
+            echo json_encode(['success' => true, 'path' => $publicPath, 'filename' => $filename]);
+            exit();
+        } else {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid data URI']);
+            exit();
+        }
+    }
+}
+
 if ($route === '/products' || $route === '/products/') {
     if ($method === 'GET') {
         echo json_encode(readProducts());
