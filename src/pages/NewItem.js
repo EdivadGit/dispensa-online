@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Html5Qrcode } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 import Product from "../class/Product";
 import { mdiBarcodeScan, mdiLoading } from "@mdi/js";
 import { Icon } from "@mdi/react";
@@ -95,22 +95,50 @@ export default function NewItem() {
       const html5QrCode = new Html5Qrcode("reader");
       scannerRef.current = html5QrCode;
 
-      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      const config = {
+        fps: 20,
+        aspectRatio: 1.0,
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.QR_CODE,
+        ],
+        advanced: [{ zoom: 3.0 }],
+        videoConstraints: {
+          facingMode: { ideal: "environment" },
+          advanced: [{ focusMode: "continuous" }, { focusMode: "auto" }],
+        },
+      };
 
       html5QrCode
         .start({ facingMode: "environment" }, config, (decodedText) => {
-          // Success callback
-          console.log(`Code matched = ${decodedText} `);
+          console.log(`Code matched = ${decodedText}`);
           stopScanning();
           setFormData((prev) => ({ ...prev, barcode: decodedText }));
           setSuccess("Barcode scansionato!");
         })
-        .catch((err) => {
-          console.error("Error starting scanner", err);
-          setError(
-            "Impossibile avviare la fotocamera, abilita l'accesso a questo sito web"
-          );
-          setScanning(false);
+        .then(() => {
+          // Dopo l'avvio, puoi accedere alle capacità della fotocamera
+          const capabilities = html5QrCode.getRunningTrackCapabilities();
+          console.log("Camera capabilities:", capabilities);
+
+          // Applica lo zoom se supportato
+          if (capabilities.zoom) {
+            html5QrCode
+              .applyVideoConstraints({
+                advanced: [{ zoom: 3.0 }], // Regola questo valore (es. 1.5, 2.0, 2.5)
+              })
+              .then(() => {
+                console.log("Zoom applicato con successo");
+              })
+              .catch((err) => {
+                console.warn("Zoom non supportato su questo dispositivo", err);
+              });
+          }
         });
     }, 100);
   };

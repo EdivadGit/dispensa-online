@@ -5,3 +5,16 @@
 #root, .App {
   height: 100vh;
 }
+
+#reader video {
+  width: 100%;
+  height: 100%;       /* forza l'altezza del contenitore */
+  object-fit: cover;  /* o contain a seconda del comportamento voluto */
+}
+
+/* se vuoi che il riquadro di scansione sia centrato */
+.html5-qrcode-region {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
