@@ -84,7 +84,9 @@ export default function RemoveItem() {
   const fetchProduct = async (barcode) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/products/${barcode}`);
+      const response = await fetch(
+        process.env.PUBLIC_URL + `/api/products/${barcode}`
+      );
 
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
@@ -115,13 +117,16 @@ export default function RemoveItem() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/products/${product.barcode}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ quantity: quantityToRemove }),
-      });
+      const response = await fetch(
+        process.env.PUBLIC_URL + `/api/products/${product.barcode}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ quantity: quantityToRemove }),
+        }
+      );
 
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {

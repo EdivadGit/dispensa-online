@@ -29,7 +29,9 @@ export default function EditProduct() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/products/item/${id}`);
+        const response = await fetch(
+          process.env.PUBLIC_URL + `/api/products/item/${id}`
+        );
         if (!response.ok) throw new Error("Prodotto non trovato");
         const data = await response.json();
         const product = Product.fromJSON(data);
@@ -61,11 +63,14 @@ export default function EditProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/products/item/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        process.env.PUBLIC_URL + `/api/products/item/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) throw new Error("Errore durante il salvataggio");
 

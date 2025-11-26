@@ -49,7 +49,7 @@ export default function Home() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/products");
+      const response = await fetch(process.env.PUBLIC_URL + "/api/products");
       const contentType = response.headers.get("content-type");
 
       if (!contentType || !contentType.includes("application/json")) {

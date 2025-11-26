@@ -236,10 +236,13 @@ class Product {
         const filename = `${this.id}_${imagePath.name || "image.png"}`;
         form.append("file", imagePath, filename);
 
-        const uploadResp = await fetch("/api/upload_image", {
-          method: "POST",
-          body: form,
-        });
+        const uploadResp = await fetch(
+          process.env.PUBLIC_URL + "/api/upload_image",
+          {
+            method: "POST",
+            body: form,
+          }
+        );
 
         if (!uploadResp.ok) {
           console.warn(
@@ -257,16 +260,19 @@ class Product {
         typeof imagePath === "string" &&
         imagePath.startsWith("data:")
       ) {
-        const uploadResp = await fetch("/api/upload_image", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            image: imagePath,
-            filename: `${this.id}.png`,
-          }),
-        });
+        const uploadResp = await fetch(
+          process.env.PUBLIC_URL + "/api/upload_image",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              image: imagePath,
+              filename: `${this.id}.png`,
+            }),
+          }
+        );
 
         if (!uploadResp.ok) {
           console.warn(
@@ -284,7 +290,7 @@ class Product {
     const payload = this.toJSON();
     payload.image = imagePath;
 
-    const response = await fetch("/api/products", {
+    const response = await fetch(process.env.PUBLIC_URL + "/api/products", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

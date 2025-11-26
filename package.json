@@ -1,6 +1,7 @@
 {
   "name": "dispensa-online",
   "version": "0.1.0",
+  "homepage": "/dispensa/",
   "private": true,
   "dependencies": {
     "@mdi/js": "^7.4.47",

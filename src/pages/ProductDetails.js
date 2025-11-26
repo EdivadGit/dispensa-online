@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import Product from "../class/Product";
 import { Icon } from "@mdi/react";
@@ -26,7 +27,9 @@ export default function ProductDetails() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/products/item/${id}`);
+        const response = await fetch(
+          process.env.PUBLIC_URL + `/api/products/item/${id}`
+        );
         if (!response.ok) {
           throw new Error("Prodotto non trovato");
         }
@@ -47,9 +50,12 @@ export default function ProductDetails() {
 
   const confirmDelete = async () => {
     try {
-      const response = await fetch(`/api/products/item/${id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        process.env.PUBLIC_URL + `/api/products/item/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (response.ok) {
         navigate("/", { state: { showSuccess: true } });
       } else {
@@ -86,13 +92,12 @@ export default function ProductDetails() {
 
   return (
     <div className="relative h-full space-y-6 max-w-3xl mx-auto p-4">
-      <a
-        href="/"
+      <Link
+        to="/"
         className="flex items-center text-gray-600 hover:text-gray-900"
       >
         <Icon path={mdiArrowLeft} size={1} /> Torna indietro
-      </a>
-
+      </Link>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="h-64 bg-gray-100 relative">
           <img
